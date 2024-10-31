@@ -5,11 +5,12 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Update and install prerequisites
-RUN apt update && apt install -y \
-    build-essential \
-    debootstrap \
-    binfmt-support \
-    qemu-user-static
+RUN apt update && \
+    apt install -y \
+        build-essential \
+        debootstrap \
+        binfmt-support \
+        qemu-user-static
 
 # Create and initialize ARM64 chroot environment with qemu-debootstrap
 RUN qemu-debootstrap --arch arm64 buster /mnt/data/arm64 http://deb.debian.org/debian/
@@ -78,7 +79,9 @@ RUN chroot /mnt/data/arm64 /bin/bash -c "\
 # Add a script to run build.sh and copy the output
 RUN echo '#!/bin/bash\n\
 arg=$1\n\
-chroot /mnt/data/arm64 /bin/bash -c "cd rk3566_core_builds && ./builds.sh $arg"\n\
+chroot /mnt/data/arm64 /bin/bash -c "\
+cd rk3566_core_builds && \
+./builds.sh $arg"\n\
 mkdir -p /mnt/host/cores64\n\
 cp /mnt/data/arm64/rk3566_core_builds/cores64/*.so /mnt/host/cores64' > /run_builds.sh
 
