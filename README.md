@@ -1,1 +1,1 @@
-# rk3566-arm64-builder
+# rk-core-builder
