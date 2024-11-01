@@ -18,7 +18,9 @@ RUN apt update && \
         build-essential \
         debootstrap \
         binfmt-support \
-        qemu-user-static
+        qemu-user-static && \
+    apt autoremove -y && \
+    apt clean
 
 # Create and initialize chroot environment with qemu-debootstrap
 RUN qemu-debootstrap --arch ${ARCH} buster /mnt/data/${ARCH} http://deb.debian.org/debian/
@@ -66,6 +68,8 @@ RUN chroot /mnt/data/${ARCH} /bin/bash -c "\
         libgbm-dev \
         libsdl2-ttf-2.0-0 \
         libsdl2-ttf-dev && \
+    apt autoremove -y && \
+    apt clean && \
     ln -s /usr/include/libdrm /usr/include/drm"
 
 # Install, clone and set up Meson in the chroot
@@ -86,11 +90,15 @@ RUN chroot /mnt/data/${ARCH} /bin/bash -c "\
 
 # Add a script to run build.sh and copy the output
 RUN echo '#!/bin/bash\n\
-chroot /mnt/data/${ARCH} /bin/bash -c "\
-cd ${CHIP}_core_builds && \
-./builds.sh $1"\n\
-mkdir -p /mnt/host/cores64\n\
-cp /mnt/data/${ARCH}/${CHIP}_core_builds/cores64/*.so /mnt/host/cores64' > /run_builds.sh
+cd /mnt/data/${ARCH}/${CHIP}_core_builds\n\
+ls . > /tmp/first_ls.txt\n\
+chroot /mnt/data/${ARCH} /bin/bash -c "cd ${CHIP}_core_builds && ./builds.sh $1"\n\
+ls . > /tmp/second_ls.txt\n\
+comm -13 <(sort /tmp/first_ls.txt) <(sort /tmp/second_ls.txt) > /tmp/changes.txt\n\
+mkdir -p /mnt/host/${CHIP}_core_builds\n\
+while IFS= read -r item; \
+do [[ -d "./${item}" ]] && [[ ! -d "./${item}/.git" ]] && cp -r "./${item}" /mnt/host/${CHIP}_core_builds; \
+done < /tmp/changes.txt' > /run_builds.sh
 
 # Make the script executable
 RUN chmod +x /run_builds.sh
