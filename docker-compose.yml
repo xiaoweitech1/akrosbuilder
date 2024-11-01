@@ -1,52 +1,52 @@
 services:
-  rk3326-32:
+  rk-core-builder-3326-32:
     build:
       context: .
-    image: rk-core-builder
-    container_name: rk3326-32
+      args:
+        - ARCH=armhf
+        - CHIP=rk3326
+        - QEMU=arm
+    image: rk-core-builder-3326-32
+    container_name: rk-core-builder-3326-32
     privileged: true
-    environment:
-      - ARCH=armhf
-      - CHIP=rk3326
-      - QEMU=arm
     volumes:
       - .:/mnt/host
 
-  rk3326-64:
+  rk-core-builder-3326-64:
     build:
       context: .
-    image: rk-core-builder
-    container_name: rk3326-64
-    privileged: true
-    environment:
+      args:
       - ARCH=arm64
       - CHIP=rk3326
       - QEMU=aarch64
+    image: rk-core-builder-3326-64
+    container_name: rk-core-builder-3326-64
+    privileged: true
     volumes:
       - .:/mnt/host
 
-  rk3566-32:
+  rk-core-builder-3566-32:
     build:
       context: .
-    image: rk-core-builder
-    container_name: rk3566-32
+      args:
+        - ARCH=armhf
+        - CHIP=rk3566
+        - QEMU=arm
+    image: rk-core-builder-3566-32
+    container_name: rk-core-builder-3566-32
     privileged: true
-    environment:
-      - ARCH=armhf
-      - CHIP=rk3566
-      - QEMU=arm
     volumes:
       - .:/mnt/host
 
-  rk3566-64:
+  rk-core-builder-3566-64:
     build:
       context: .
-    image: rk-core-builder
-    container_name: rk3566-64
+      args:
+        - ARCH=arm64
+        - CHIP=rk3566
+        - QEMU=aarch64
+    image: rk-core-builder-3566-64
+    container_name: rk-core-builder-3566-64
     privileged: true
-    environment:
-      - ARCH=arm64
-      - CHIP=rk3566
-      - QEMU=aarch64
     volumes:
       - .:/mnt/host
