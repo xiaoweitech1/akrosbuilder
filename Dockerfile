@@ -1,11 +1,16 @@
 # Use Ubuntu 20.04 as the base image
 FROM ubuntu:20.04
 
-# Set environment variables
-ENV ARCH=${ARCH:-arm64}
-ENV CHIP=${CHIP:-rk3566}
+# Set arguments for building
+ARG ARCH
+ARG CHIP
+ARG QEMU
+
+# Set environment variables for running
+ENV ARCH=${ARCH}
 ENV DEBIAN_FRONTEND=noninteractive
-ENV QEMU=${QEMU:-aarch64}
+ENV CHIP=${CHIP}
+ENV QEMU=${QEMU}
 
 # Update and install prerequisites
 RUN apt update && \
@@ -75,16 +80,15 @@ RUN chroot /mnt/data/${ARCH} /bin/bash -c "\
     mkdir -p /usr/include/go2 && \
     cp libgo2/src/*.h /usr/include/go2/"
 
-# Clone *_core_builds repository within the chroot
+# Clone core_builds repository within the chroot
 RUN chroot /mnt/data/${ARCH} /bin/bash -c "\
     git clone https://github.com/christianhaitian/${CHIP}_core_builds.git"
 
 # Add a script to run build.sh and copy the output
 RUN echo '#!/bin/bash\n\
-arg=$1\n\
 chroot /mnt/data/${ARCH} /bin/bash -c "\
 cd ${CHIP}_core_builds && \
-./builds.sh $arg"\n\
+./builds.sh $1"\n\
 mkdir -p /mnt/host/cores64\n\
 cp /mnt/data/${ARCH}/${CHIP}_core_builds/cores64/*.so /mnt/host/cores64' > /run_builds.sh
 
