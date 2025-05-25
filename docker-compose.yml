@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # RK3326 Core Builders
   rk-core-builder-3326-32:
     build:
       context: .
@@ -6,25 +9,28 @@ services:
         - ARCH=armhf
         - CHIP=rk3326
         - QEMU=arm
+        - BUILD_MODE=core
     image: rk-core-builder-3326-32
     container_name: rk-core-builder-3326-32
     privileged: true
     volumes:
-      - .:/mnt/host
+      - ./build:/mnt/host
 
   rk-core-builder-3326-64:
     build:
       context: .
       args:
-      - ARCH=arm64
-      - CHIP=rk3326
-      - QEMU=aarch64
+        - ARCH=arm64
+        - CHIP=rk3326
+        - QEMU=aarch64
+        - BUILD_MODE=core
     image: rk-core-builder-3326-64
     container_name: rk-core-builder-3326-64
     privileged: true
     volumes:
-      - .:/mnt/host
+      - ./build:/mnt/host
 
+  # RK3566 Core Builders
   rk-core-builder-3566-32:
     build:
       context: .
@@ -32,11 +38,12 @@ services:
         - ARCH=armhf
         - CHIP=rk3566
         - QEMU=arm
+        - BUILD_MODE=core
     image: rk-core-builder-3566-32
     container_name: rk-core-builder-3566-32
     privileged: true
     volumes:
-      - .:/mnt/host
+      - ./build:/mnt/host
 
   rk-core-builder-3566-64:
     build:
@@ -45,8 +52,27 @@ services:
         - ARCH=arm64
         - CHIP=rk3566
         - QEMU=aarch64
+        - BUILD_MODE=core
     image: rk-core-builder-3566-64
     container_name: rk-core-builder-3566-64
     privileged: true
     volumes:
-      - .:/mnt/host
+      - ./build:/mnt/host
+
+  # Custom Builders
+  custom-builder-3326-64:
+    build:
+      context: .
+      args:
+        - ARCH=arm64
+        - CHIP=rk3326
+        - QEMU=aarch64
+        - BUILD_MODE=custom
+    image: custom-builder-3326-64
+    container_name: custom-builder-3326-64
+    privileged: true
+    volumes:
+      - ./build:/mnt/host
+      - ./packages:/source
+      - ./build:/output
+      - ../EmulationStation-fcamod:/source/EmulationStation
